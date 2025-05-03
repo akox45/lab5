@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Kép törlése{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Kép törlése</h2>
+    </div>
+    <div class="card-body">
+        <p>Biztosan törölni szeretnéd a következő képet: <strong>{{ photo.name }}</strong>?</p>
+        <div class="text-center mb-3">
+            <img src="{{ photo.image.url }}" alt="{{ photo.name }}" style="max-height: 300px;">
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Igen, törlöm</button>
+            <a href="{% url 'photo_detail' photo.id %}" class="btn btn-secondary">Mégsem</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

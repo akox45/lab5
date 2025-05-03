@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Kép feltöltése{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Új kép feltöltése</h2>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div class="text-danger">{{ form.name.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+                {{ form.image }}
+                {% if form.image.errors %}
+                    <div class="text-danger">{{ form.image.errors }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">Feltöltés</button>
+            <a href="{% url 'photo_list' %}" class="btn btn-secondary">Mégsem</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

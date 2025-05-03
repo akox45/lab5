@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Fényképek{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Fényképek</h1>
+    <div class="btn-group">
+        <a href="{% url 'photo_list' %}?sort=date" class="btn btn-outline-primary {% if sort_by == 'date' %}active{% endif %}">Dátum szerint</a>
+        <a href="{% url 'photo_list' %}?sort=name" class="btn btn-outline-primary {% if sort_by == 'name' %}active{% endif %}">Név szerint</a>
+    </div>
+</div>
+
+{% if photos %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for photo in photos %}
+            <div class="col">
+                <div class="card h-100">
+                    <a href="{% url 'photo_detail' photo.id %}">
+                        <img src="{{ photo.image.url }}" class="card-img-top" alt="{{ photo.name }}">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ photo.name }}</h5>
+                        <p class="card-text text-muted">
+                            <small>Feltöltve: {{ photo.upload_date|date:"Y-m-d H:i" }}</small><br>
+                            <small>Feltöltő: {{ photo.user.username }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        Még nincsenek feltöltött képek.
+        {% if user.is_authenticated %}
+            <a href="{% url 'photo_upload' %}">Töltsd fel az elsőt!</a>
+        {% else %}
+            <a href="{% url 'login' %}">Jelentkezz be</a> a képfeltöltéshez!
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

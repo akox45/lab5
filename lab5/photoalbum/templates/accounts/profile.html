@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h2>{{ user.username }} profilja</h2>
+    </div>
+    <div class="card-body">
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Regisztráció dátuma:</strong> {{ user.date_joined|date:"Y-m-d H:i" }}</p>
+    </div>
+</div>
+
+<h3>Saját képeim</h3>
+{% if user_photos %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for photo in user_photos %}
+            <div class="col">
+                <div class="card h-100">
+                    <a href="{% url 'photo_detail' photo.id %}">
+                        <img src="{{ photo.image.url }}" class="card-img-top" alt="{{ photo.name }}">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ photo.name }}</h5>
+                        <p class="card-text text-muted">
+                            <small>Feltöltve: {{ photo.upload_date|date:"Y-m-d H:i" }}</small>
+                        </p>
+                        <form action="{% url 'photo_delete' photo.id %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Biztosan törölni szeretnéd ezt a képet?');">Törlés</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        Még nincsenek feltöltött képeid. <a href="{% url 'photo_upload' %}">Töltsd fel az elsőt!</a>
+    </div>
+{% endif %}
+{% endblock %}

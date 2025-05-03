@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ photo.name }}{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>{{ photo.name }}</h2>
+        {% if user == photo.user %}
+            <form action="{% url 'photo_delete' photo.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Biztosan törölni szeretnéd ezt a képet?');">Törlés</button>
+            </form>
+        {% endif %}
+    </div>
+    <div class="card-body text-center">
+        <img src="{{ photo.image.url }}" class="img-fluid" alt="{{ photo.name }}">
+    </div>
+    <div class="card-footer text-muted">
+        Feltöltve: {{ photo.upload_date|date:"Y-m-d H:i" }}<br>
+        Feltöltő: {{ photo.user.username }}
+    </div>
+</div>
+<a href="{% url 'photo_list' %}" class="btn btn-primary">Vissza a listához</a>
+{% endblock %}
