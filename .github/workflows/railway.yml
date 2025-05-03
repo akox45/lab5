@@ -40,35 +40,36 @@ jobs:
             echo "Using existing project: $PROJECT_ID"
           fi
           echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
+          echo "RAILWAY_PROJECT=$PROJECT_ID" >> $GITHUB_ENV
 
       - name: Add Django (repo) service
         run: |
-          railway service list --project $PROJECT_ID --json | jq -r ".services[] | .name" | grep -q "^web$" || \
-          railway service create --project $PROJECT_ID --name web --source repo --repo ${{ github.repository }}
+          railway service list --json | jq -r ".services[] | .name" | grep -q "^web$" || \
+          railway service create --name web --source repo --repo ${{ github.repository }}
 
       - name: Add PostgreSQL plugin
         run: |
-          railway plugin list --project $PROJECT_ID --json | jq -r ".plugins[] | .name" | grep -q "^PostgreSQL$" || \
-          railway plugin add postgresql --project $PROJECT_ID
+          railway plugin list --json | jq -r ".plugins[] | .name" | grep -q "^PostgreSQL$" || \
+          railway plugin add postgresql
 
       - name: Add MinIO Docker service
         run: |
-          railway service list --project $PROJECT_ID --json | jq -r ".services[] | .name" | grep -q "^$MINIO_SERVICE_NAME$" || \
-          railway service create --project $PROJECT_ID --name $MINIO_SERVICE_NAME --source image --image $MINIO_IMAGE --command "$MINIO_COMMAND" --port $MINIO_API_PORT --port $MINIO_ADMIN_PORT
+          railway service list --json | jq -r ".services[] | .name" | grep -q "^$MINIO_SERVICE_NAME$" || \
+          railway service create --name $MINIO_SERVICE_NAME --source image --image $MINIO_IMAGE --command "$MINIO_COMMAND" --port $MINIO_API_PORT --port $MINIO_ADMIN_PORT
 
       - name: Set environment variables for Django service
         run: |
-          DJANGO_SERVICE_ID=$(railway service list --project $PROJECT_ID --json | jq -r ".services[] | select(.name==\"web\") | .id")
-          ENV_ID=$(railway environment list --project $PROJECT_ID --json | jq -r ".environments[0].id")
-          DB_URL=$(railway variable get --project $PROJECT_ID --environment $ENV_ID | grep DATABASE_URL | awk '{print $2}')
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID DATABASE_URL "$DB_URL"
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_ENDPOINT "http://minio:9000"
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_ACCESS_KEY "$MINIO_ACCESS_KEY"
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_SECRET_KEY "$MINIO_SECRET_KEY"
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_BUCKET_NAME "$MINIO_BUCKET_NAME"
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_USE_SSL "False"
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID SECRET_KEY "$DJANGO_SECRET_KEY"
-          railway variable set --project $PROJECT_ID --environment $ENV_ID --service $DJANGO_SERVICE_ID DEBUG "$DJANGO_DEBUG"
+          DJANGO_SERVICE_ID=$(railway service list --json | jq -r ".services[] | select(.name==\"web\") | .id")
+          ENV_ID=$(railway environment list --json | jq -r ".environments[0].id")
+          DB_URL=$(railway variable get --environment $ENV_ID | grep DATABASE_URL | awk '{print $2}')
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID DATABASE_URL "$DB_URL"
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_ENDPOINT "http://minio:9000"
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_ACCESS_KEY "$MINIO_ACCESS_KEY"
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_SECRET_KEY "$MINIO_SECRET_KEY"
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_BUCKET_NAME "$MINIO_BUCKET_NAME"
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_USE_SSL "False"
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID SECRET_KEY "$DJANGO_SECRET_KEY"
+          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID DEBUG "$DJANGO_DEBUG"
 
       - name: Install MinIO CLI
         run: |
@@ -94,4 +95,4 @@ jobs:
 
       - name: Deploy to Railway
         run: |
-          railway up --project $PROJECT_ID 
+          railway up 
