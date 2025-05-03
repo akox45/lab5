@@ -1,4 +1,4 @@
-name: Full Auto Railway Deploy (Test)
+name: Railway Deploy Only
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
       PROJECT_NAME: photoalbum-test
       MINIO_SERVICE_NAME: minio
       MINIO_IMAGE: minio/minio
-      MINIO_COMMAND: server /data --console-address :9001
+      MINIO_COMMAND: minio server /data --console-address :9001
       MINIO_API_PORT: 9000
       MINIO_ADMIN_PORT: 9001
       MINIO_BUCKET_NAME: photoalbum
@@ -29,70 +29,5 @@ jobs:
       - name: Add Railway CLI to PATH
         run: echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: Create or select Railway project
-        id: project
-        run: |
-          PROJECT_ID=$(railway project list --json | jq -r ".projects[] | select(.name==\"$PROJECT_NAME\") | .id")
-          if [ -z "$PROJECT_ID" ]; then
-            PROJECT_ID=$(railway project create --name $PROJECT_NAME --json | jq -r ".id")
-            echo "Created new project: $PROJECT_ID"
-          else
-            echo "Using existing project: $PROJECT_ID"
-          fi
-          echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
-          echo "RAILWAY_PROJECT=$PROJECT_ID" >> $GITHUB_ENV
-
-      - name: Add Django (repo) service
-        run: |
-          railway service list --json | jq -r ".services[] | .name" | grep -q "^web$" || \
-          railway service create --name web --source repo --repo ${{ github.repository }}
-
-      - name: Add PostgreSQL plugin
-        run: |
-          railway plugin list --json | jq -r ".plugins[] | .name" | grep -q "^PostgreSQL$" || \
-          railway plugin add postgresql
-
-      - name: Add MinIO Docker service
-        run: |
-          railway service list --json | jq -r ".services[] | .name" | grep -q "^$MINIO_SERVICE_NAME$" || \
-          railway service create --name $MINIO_SERVICE_NAME --source image --image $MINIO_IMAGE --command "$MINIO_COMMAND" --port $MINIO_API_PORT --port $MINIO_ADMIN_PORT
-
-      - name: Set environment variables for Django service
-        run: |
-          DJANGO_SERVICE_ID=$(railway service list --json | jq -r ".services[] | select(.name==\"web\") | .id")
-          ENV_ID=$(railway environment list --json | jq -r ".environments[0].id")
-          DB_URL=$(railway variable get --environment $ENV_ID | grep DATABASE_URL | awk '{print $2}')
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID DATABASE_URL "$DB_URL"
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_ENDPOINT "http://minio:9000"
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_ACCESS_KEY "$MINIO_ACCESS_KEY"
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_SECRET_KEY "$MINIO_SECRET_KEY"
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_BUCKET_NAME "$MINIO_BUCKET_NAME"
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID MINIO_USE_SSL "False"
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID SECRET_KEY "$DJANGO_SECRET_KEY"
-          railway variable set --environment $ENV_ID --service $DJANGO_SERVICE_ID DEBUG "$DJANGO_DEBUG"
-
-      - name: Install MinIO CLI
-        run: |
-          wget https://dl.min.io/client/mc/release/linux-amd64/mc
-          chmod +x mc
-          sudo mv mc /usr/local/bin/
-
-      - name: Wait for MinIO to be available
-        run: |
-          for i in {1..30}; do
-            if nc -zv minio 9000; then
-              echo "MinIO is up!"
-              break
-            fi
-            echo "Waiting for MinIO..."
-            sleep 5
-          done
-
-      - name: Create MinIO bucket
-        run: |
-          mc alias set myminio http://minio:9000 admin adminadmin --api S3v4
-          mc mb --ignore-existing myminio/photoalbum
-
       - name: Deploy to Railway
-        run: |
-          railway up 
+        run: railway up 
