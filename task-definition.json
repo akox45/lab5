@@ -1,90 +1,61 @@
 {
-    "taskDefinition": {
-        "taskDefinitionArn": "arn:aws:ecs:eu-central-1:084821390246:task-definition/photoalbum-django:1",
-        "containerDefinitions": [
-            {
-                "name": "django",
-                "image": "084821390246.dkr.ecr.eu-central-1.amazonaws.com/photoalbum-mvp-django",
-                "cpu": 0,
-                "portMappings": [
-                    {
-                        "containerPort": 8000,
-                        "hostPort": 8000,
-                        "protocol": "tcp"
-                    }
-                ],
-                "essential": true,
-                "environment": [
-                    {
-                        "name": "DATABASE_URL",
-                        "value": "postgres://photoalbum:pcm89dZyw22CRalt@terraform-20250504123144577700000001.cncc64sqaa80.eu-central-1.rds.amazonaws.com:5432:5432/photoalbum"
-                    },
-                    {
-                        "name": "AWS_ACCESS_KEY_ID",
-                        "value": "AKIAIOSFODNN7EXAMPLE"
-                    },
-                    {
-                        "name": "USE_S3",
-                        "value": "True"
-                    },
-                    {
-                        "name": "AWS_SECRET_ACCESS_KEY",
-                        "value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-                    },
-                    {
-                        "name": "AWS_S3_REGION_NAME",
-                        "value": "eu-central-1"
-                    },
-                    {
-                        "name": "SECRET_KEY",
-                        "value": "admin"
-                    },
-                    {
-                        "name": "DEBUG",
-                        "value": "False"
-                    },
-                    {
-                        "name": "AWS_STORAGE_BUCKET_NAME",
-                        "value": "photoalbum-mvp-photos-72ff1842"
-                    }
-                ],
-                "mountPoints": [],
-                "volumesFrom": [],
-                "systemControls": []
-            }
-        ],
-        "family": "photoalbum-django",
-        "executionRoleArn": "arn:aws:iam::084821390246:role/photoalbum-ecs-task-execution",
-        "networkMode": "awsvpc",
-        "revision": 1,
-        "volumes": [],
-        "status": "ACTIVE",
-        "requiresAttributes": [
-            {
-                "name": "com.amazonaws.ecs.capability.ecr-auth"
-            },
-            {
-                "name": "ecs.capability.execution-role-ecr-pull"
-            },
-            {
-                "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-            },
-            {
-                "name": "ecs.capability.task-eni"
-            }
-        ],
-        "placementConstraints": [],
-        "compatibilities": [
-            "EC2",
-            "FARGATE"
-        ],
-        "requiresCompatibilities": [
-            "FARGATE"
-        ],
-        "cpu": "256",
-        "memory": "512",
-        "registeredAt": "2025-05-04T08:36:12.134000-04:00",
-        "registeredBy": "arn:aws:iam::084821390246:user/admin-useer"
-    },
-    "tags": []
+    "family": "photoalbum-django",
+    "containerDefinitions": [
+        {
+            "name": "django",
+            "image": "084821390246.dkr.ecr.eu-central-1.amazonaws.com/photoalbum-mvp-django",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "DATABASE_URL",
+                    "value": "postgres://photoalbum:pcm89dZyw22CRalt@terraform-20250504123144577700000001.cncc64sqaa80.eu-central-1.rds.amazonaws.com:5432/photoalbum"
+                },
+                {
+                    "name": "AWS_ACCESS_KEY_ID",
+                    "value": "AKIAIOSFODNN7EXAMPLE"
+                },
+                {
+                    "name": "USE_S3",
+                    "value": "True"
+                },
+                {
+                    "name": "AWS_SECRET_ACCESS_KEY",
+                    "value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+                },
+                {
+                    "name": "AWS_S3_REGION_NAME",
+                    "value": "eu-central-1"
+                },
+                {
+                    "name": "SECRET_KEY",
+                    "value": "admin"
+                },
+                {
+                    "name": "DEBUG",
+                    "value": "False"
+                },
+                {
+                    "name": "AWS_STORAGE_BUCKET_NAME",
+                    "value": "photoalbum-mvp-photos-72ff1842"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": []
+        }
+    ],
+    "executionRoleArn": "arn:aws:iam::084821390246:role/photoalbum-ecs-task-execution",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512"
 }
