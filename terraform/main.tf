@@ -125,6 +125,12 @@ resource "aws_iam_role_policy_attachment" "ecs_s3_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
+# --- CloudWatch Log Group ---
+resource "aws_cloudwatch_log_group" "django" {
+  name              = "/ecs/photoalbum-django"
+  retention_in_days = 30
+}
+
 # --- ECS Task Definition ---
 resource "aws_ecs_task_definition" "django" {
   family                   = "photoalbum-django"
@@ -152,7 +158,7 @@ resource "aws_ecs_task_definition" "django" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group = "/ecs/photoalbum-django"
+          awslogs-group = aws_cloudwatch_log_group.django.name
           awslogs-region = var.aws_region
           awslogs-stream-prefix = "ecs"
         }
