@@ -159,21 +159,24 @@ resource "aws_ecs_task_definition" "django" {
   cpu                      = 256
   memory                   = 512
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task_execution.arn
   container_definitions    = jsonencode([
     {
       name      = "django"
-      image     = aws_ecr_repository.django.repository_url
+      image     = "${aws_ecr_repository.django.repository_url}:v1"
       essential = true
       portMappings = [{ containerPort = 8000, hostPort = 8000 }]
       environment = [
-        { name = "USE_S3", value = "True" },
-        { name = "AWS_ACCESS_KEY_ID", value = var.aws_access_key_id },
-        { name = "AWS_SECRET_ACCESS_KEY", value = var.aws_secret_access_key },
-        { name = "AWS_STORAGE_BUCKET_NAME", value = aws_s3_bucket.photos.bucket },
-        { name = "AWS_S3_REGION_NAME", value = var.aws_region },
         { name = "DATABASE_URL", value = "postgres://${aws_db_instance.postgres.username}:${urlencode(random_password.db_password.result)}@${aws_db_instance.postgres.endpoint}/photoalbum" },
+        { name = "USE_S3", value = "True" },
+        { name = "AWS_S3_OBJECT_PARAMETERS", value = "{\"CacheControl\": \"max-age=86400\"}" },
+        { name = "AWS_S3_REGION_NAME", value = var.aws_region },
         { name = "SECRET_KEY", value = var.django_secret_key },
-        { name = "DEBUG", value = "False" }
+        { name = "AWS_STORAGE_BUCKET_NAME", value = aws_s3_bucket.photos.bucket },
+        { name = "DEBUG", value = "True" },
+        { name = "CORS_ALLOW_ALL_ORIGINS", value = "True" },
+        { name = "CORS_ALLOW_CREDENTIALS", value = "True" },
+        { name = "ALLOWED_HOSTS", value = "*" }
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -182,6 +185,13 @@ resource "aws_ecs_task_definition" "django" {
           awslogs-region = var.aws_region
           awslogs-stream-prefix = "ecs"
         }
+      }
+      healthCheck = {
+        command = ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"]
+        interval = 30
+        timeout = 5
+        retries = 3
+        startPeriod = 60
       }
     }
   ])
