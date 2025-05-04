@@ -12,4 +12,8 @@ RUN pip install --upgrade pip \
 
 COPY photoalbum /app
 
-CMD ["gunicorn", "photoalbum.wsgi:application", "--bind", "0.0.0.0:8000"] 
+# Statikus fájlok gyűjtése build időben
+RUN python manage.py collectstatic --noinput
+
+# Indításkor migráció, majd gunicorn
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn photoalbum.wsgi:application --bind 0.0.0.0:8000"] 
