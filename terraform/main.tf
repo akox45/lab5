@@ -151,7 +151,7 @@ resource "aws_ecs_task_definition" "django" {
         { name = "AWS_SECRET_ACCESS_KEY", value = var.aws_secret_access_key },
         { name = "AWS_STORAGE_BUCKET_NAME", value = aws_s3_bucket.photos.bucket },
         { name = "AWS_S3_REGION_NAME", value = var.aws_region },
-        { name = "DATABASE_URL", value = "postgres://${aws_db_instance.postgres.username}:${random_password.db_password.result}@${aws_db_instance.postgres.endpoint}:5432/photoalbum" },
+        { name = "DATABASE_URL", value = "postgres://${aws_db_instance.postgres.username}:${urlencode(random_password.db_password.result)}@${aws_db_instance.postgres.endpoint}/photoalbum" },
         { name = "SECRET_KEY", value = var.django_secret_key },
         { name = "DEBUG", value = "False" }
       ]
