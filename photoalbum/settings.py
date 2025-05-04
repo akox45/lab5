@@ -36,6 +36,6 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # Biztonsági beállítások
 ALLOWED_HOSTS = ['*']  # Éles környezetben pontosítsd ezt!
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True 
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False 
