@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,38 +78,31 @@ WSGI_APPLICATION = 'photoalbum.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR}/db.sqlite3'),
-        conn_max_age=600,
-        ssl_require=False
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
-# S3/MinIO storage settings
-USE_S3 = all([
-    os.environ.get('MINIO_ENDPOINT'),
-    os.environ.get('MINIO_ACCESS_KEY'),
-    os.environ.get('MINIO_SECRET_KEY'),
-    os.environ.get('MINIO_BUCKET_NAME'),
-])
-
-if USE_S3:
+# --- AWS S3 MEDIA STORAGE ---
+if os.environ.get('USE_S3', 'False') == 'True':
+    INSTALLED_APPS += ['storages']
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    AWS_S3_ENDPOINT_URL = os.environ['MINIO_ENDPOINT']
-    AWS_ACCESS_KEY_ID = os.environ['MINIO_ACCESS_KEY']
-    AWS_SECRET_ACCESS_KEY = os.environ['MINIO_SECRET_KEY']
-    AWS_STORAGE_BUCKET_NAME = os.environ['MINIO_BUCKET_NAME']
-    AWS_S3_REGION_NAME = os.environ.get('MINIO_REGION', 'us-east-1')
-    AWS_S3_SIGNATURE_VERSION = 's3v4'
-    AWS_S3_ADDRESSING_STYLE = 'path'
-    AWS_S3_USE_SSL = os.environ.get('MINIO_USE_SSL', 'False') == 'True'
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     AWS_DEFAULT_ACL = None
-    AWS_QUERYSTRING_AUTH = False
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
     MEDIA_ROOT = None
-else:
-    MEDIA_URL = 'media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
+
+# --- PostgreSQL DATABASE (dj-database-url) ---
+import dj_database_url
+if os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.parse(os.environ['DATABASE_URL'], conn_max_age=600, ssl_require=True)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -156,6 +148,7 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 LOGIN_URL = 'login'
 
