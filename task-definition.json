@@ -40,16 +40,20 @@
                     "value": "django-insecure-1234567890abcdefghijklmnopqrstuvwxyz"
                 },
                 {
-                    "name": "AWS_S3_CUSTOM_DOMAIN",
-                    "value": "photoalbum-mvp-photos-72ff1842.s3.amazonaws.com"
+                    "name": "AWS_STORAGE_BUCKET_NAME",
+                    "value": "photoalbum-mvp-photos-72ff1842"
                 },
                 {
                     "name": "DEBUG",
                     "value": "True"
                 },
                 {
-                    "name": "AWS_STORAGE_BUCKET_NAME",
-                    "value": "photoalbum-mvp-photos-72ff1842"
+                    "name": "CORS_ALLOW_ALL_ORIGINS",
+                    "value": "True"
+                },
+                {
+                    "name": "CORS_ALLOW_CREDENTIALS",
+                    "value": "True"
                 }
             ],
             "logConfiguration": {
