@@ -27,7 +27,7 @@ resource "random_id" "suffix" {
 resource "aws_db_instance" "postgres" {
   allocated_storage    = 20
   engine               = "postgres"
-  engine_version       = "15.4"
+  engine_version       = "15.5"
   instance_class       = "db.t3.micro"
   db_name              = "photoalbum"
   username             = "photoalbum"
