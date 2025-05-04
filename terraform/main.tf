@@ -149,6 +149,14 @@ resource "aws_ecs_task_definition" "django" {
         { name = "SECRET_KEY", value = var.django_secret_key },
         { name = "DEBUG", value = "False" }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = "/ecs/photoalbum-django"
+          awslogs-region = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
 }

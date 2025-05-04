@@ -1,0 +1,139 @@
+{
+    "services": [
+        {
+            "serviceArn": "arn:aws:ecs:eu-central-1:084821390246:service/photoalbum-mvp-cluster/photoalbum-django-service",
+            "serviceName": "photoalbum-django-service",
+            "clusterArn": "arn:aws:ecs:eu-central-1:084821390246:cluster/photoalbum-mvp-cluster",
+            "loadBalancers": [
+                {
+                    "targetGroupArn": "arn:aws:elasticloadbalancing:eu-central-1:084821390246:targetgroup/photoalbum-django-tg/ddeaf4be266d6f7d",
+                    "containerName": "django",
+                    "containerPort": 8000
+                }
+            ],
+            "serviceRegistries": [],
+            "status": "ACTIVE",
+            "desiredCount": 1,
+            "runningCount": 0,
+            "pendingCount": 0,
+            "launchType": "FARGATE",
+            "platformVersion": "LATEST",
+            "platformFamily": "Linux",
+            "taskDefinition": "arn:aws:ecs:eu-central-1:084821390246:task-definition/photoalbum-django:1",
+            "deploymentConfiguration": {
+                "deploymentCircuitBreaker": {
+                    "enable": false,
+                    "rollback": false
+                },
+                "maximumPercent": 200,
+                "minimumHealthyPercent": 100
+            },
+            "deployments": [
+                {
+                    "id": "ecs-svc/9204310311217403545",
+                    "status": "PRIMARY",
+                    "taskDefinition": "arn:aws:ecs:eu-central-1:084821390246:task-definition/photoalbum-django:1",
+                    "desiredCount": 1,
+                    "pendingCount": 0,
+                    "runningCount": 0,
+                    "failedTasks": 0,
+                    "createdAt": "2025-05-04T10:20:01.392000-04:00",
+                    "updatedAt": "2025-05-04T10:20:40.078000-04:00",
+                    "launchType": "FARGATE",
+                    "platformVersion": "1.4.0",
+                    "platformFamily": "Linux",
+                    "networkConfiguration": {
+                        "awsvpcConfiguration": {
+                            "subnets": [
+                                "subnet-0fba1be5c2647bbc0",
+                                "subnet-071efe9b28abd3572",
+                                "subnet-0f40de3368159c562"
+                            ],
+                            "securityGroups": [
+                                "sg-0292d0d263649847b"
+                            ],
+                            "assignPublicIp": "ENABLED"
+                        }
+                    },
+                    "rolloutState": "IN_PROGRESS",
+                    "rolloutStateReason": "ECS deployment ecs-svc/9204310311217403545 in progress."
+                }
+            ],
+            "roleArn": "arn:aws:iam::084821390246:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+            "events": [
+                {
+                    "id": "abe389a8-5a6c-46ca-837a-a51905d23acc",
+                    "createdAt": "2025-05-04T10:21:59.976000-04:00",
+                    "message": "(service photoalbum-django-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:eu-central-1:084821390246:targetgroup/photoalbum-django-tg/ddeaf4be266d6f7d)"
+                },
+                {
+                    "id": "d5f6ea58-ec94-4e91-a8ae-216f2f481328",
+                    "createdAt": "2025-05-04T10:21:59.900000-04:00",
+                    "message": "(service photoalbum-django-service, taskSet ecs-svc/9204310311217403545) has begun draining connections on 1 tasks."
+                },
+                {
+                    "id": "a15f7e23-580d-4658-9532-3d562e2f4c22",
+                    "createdAt": "2025-05-04T10:21:59.895000-04:00",
+                    "message": "(service photoalbum-django-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:eu-central-1:084821390246:targetgroup/photoalbum-django-tg/ddeaf4be266d6f7d)"
+                },
+                {
+                    "id": "49d3fe6e-1cc1-4c68-a6fc-6195303b2e80",
+                    "createdAt": "2025-05-04T10:21:18.764000-04:00",
+                    "message": "(service photoalbum-django-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:eu-central-1:084821390246:targetgroup/photoalbum-django-tg/ddeaf4be266d6f7d)"
+                },
+                {
+                    "id": "18613b0c-96c8-483e-93fe-3dc2d71be829",
+                    "createdAt": "2025-05-04T10:20:56.505000-04:00",
+                    "message": "(service photoalbum-django-service, taskSet ecs-svc/9204310311217403545) has begun draining connections on 1 tasks."
+                },
+                {
+                    "id": "329196cb-2611-4bbb-a9db-9bb7af31cf78",
+                    "createdAt": "2025-05-04T10:20:56.500000-04:00",
+                    "message": "(service photoalbum-django-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:eu-central-1:084821390246:targetgroup/photoalbum-django-tg/ddeaf4be266d6f7d)"
+                },
+                {
+                    "id": "91bdb78e-5be0-4d17-9c50-11dfa1b07b74",
+                    "createdAt": "2025-05-04T10:20:47.705000-04:00",
+                    "message": "(service photoalbum-django-service) has started 1 tasks: (task 78be1446a7cf4aa39603a454ccc7717b)."
+                },
+                {
+                    "id": "20543d4a-da9f-44cc-a12e-d578d8d11859",
+                    "createdAt": "2025-05-04T10:20:37.785000-04:00",
+                    "message": "(service photoalbum-django-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:eu-central-1:084821390246:targetgroup/photoalbum-django-tg/ddeaf4be266d6f7d)"
+                },
+                {
+                    "id": "bbb94616-75f0-4c28-ba66-7db7663bbe48",
+                    "createdAt": "2025-05-04T10:20:16.784000-04:00",
+                    "message": "(service photoalbum-django-service) has started 1 tasks: (task bedb0239a0e7413385ffece205caf3d0)."
+                }
+            ],
+            "createdAt": "2025-05-04T10:20:01.392000-04:00",
+            "placementConstraints": [],
+            "placementStrategy": [],
+            "networkConfiguration": {
+                "awsvpcConfiguration": {
+                    "subnets": [
+                        "subnet-0fba1be5c2647bbc0",
+                        "subnet-071efe9b28abd3572",
+                        "subnet-0f40de3368159c562"
+                    ],
+                    "securityGroups": [
+                        "sg-0292d0d263649847b"
+                    ],
+                    "assignPublicIp": "ENABLED"
+                }
+            },
+            "healthCheckGracePeriodSeconds": 0,
+            "schedulingStrategy": "REPLICA",
+            "deploymentController": {
+                "type": "ECS"
+            },
+            "createdBy": "arn:aws:iam::084821390246:user/admin-useer",
+            "enableECSManagedTags": false,
+            "propagateTags": "NONE",
+            "enableExecuteCommand": false,
+            "availabilityZoneRebalancing": "DISABLED"
+        }
+    ],
+    "failures": []
+}

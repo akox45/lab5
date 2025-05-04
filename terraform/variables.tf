@@ -1,5 +1,5 @@
 variable "aws_region" {
-  description = "AWS régió"
+  description = "AWS Region"
   type        = string
   default     = "eu-central-1"
 }
@@ -11,16 +11,19 @@ variable "db_instance_class" {
 }
 
 variable "aws_access_key_id" {
-  description = "AWS Access Key ID az ECS taskhoz (S3 eléréshez)"
+  description = "AWS Access Key ID"
   type        = string
+  sensitive   = true
 }
 
 variable "aws_secret_access_key" {
-  description = "AWS Secret Access Key az ECS taskhoz (S3 eléréshez)"
+  description = "AWS Secret Access Key"
   type        = string
+  sensitive   = true
 }
 
 variable "django_secret_key" {
-  description = "Django SECRET_KEY"
+  description = "Django Secret Key"
   type        = string
+  sensitive   = true
 } 
