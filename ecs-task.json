@@ -1,0 +1,104 @@
+{
+    "tasks": [
+        {
+            "attachments": [
+                {
+                    "id": "31f49c27-6e9f-43e2-91d7-b69f283ac746",
+                    "type": "ElasticNetworkInterface",
+                    "status": "DETACHED",
+                    "details": [
+                        {
+                            "name": "subnetId",
+                            "value": "subnet-0fba1be5c2647bbc0"
+                        },
+                        {
+                            "name": "networkInterfaceId",
+                            "value": "eni-0bccdf0bd3d56aaf6"
+                        },
+                        {
+                            "name": "macAddress",
+                            "value": "02:d0:ad:c1:36:87"
+                        },
+                        {
+                            "name": "privateDnsName",
+                            "value": "ip-172-31-26-48.eu-central-1.compute.internal"
+                        },
+                        {
+                            "name": "privateIPv4Address",
+                            "value": "172.31.26.48"
+                        }
+                    ]
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "ecs.cpu-architecture",
+                    "value": "x86_64"
+                }
+            ],
+            "availabilityZone": "eu-central-1a",
+            "clusterArn": "arn:aws:ecs:eu-central-1:084821390246:cluster/photoalbum-mvp-cluster",
+            "connectivity": "CONNECTED",
+            "connectivityAt": "2025-05-04T09:42:15.964000-04:00",
+            "containers": [
+                {
+                    "containerArn": "arn:aws:ecs:eu-central-1:084821390246:container/photoalbum-mvp-cluster/6508d1456a204aadb382df4342aea8f3/7469a7b5-38f6-4ee4-bb1a-ec67c8bb5647",
+                    "taskArn": "arn:aws:ecs:eu-central-1:084821390246:task/photoalbum-mvp-cluster/6508d1456a204aadb382df4342aea8f3",
+                    "name": "django",
+                    "image": "084821390246.dkr.ecr.eu-central-1.amazonaws.com/photoalbum-mvp-django",
+                    "imageDigest": "sha256:d9380d1457ec006a1d919c8fc2f4b05123ebd63277e3a0533b3e6bf758e3fd56",
+                    "runtimeId": "6508d1456a204aadb382df4342aea8f3-3079480798",
+                    "lastStatus": "STOPPED",
+                    "exitCode": 1,
+                    "networkBindings": [],
+                    "networkInterfaces": [
+                        {
+                            "attachmentId": "31f49c27-6e9f-43e2-91d7-b69f283ac746",
+                            "privateIpv4Address": "172.31.26.48"
+                        }
+                    ],
+                    "healthStatus": "UNKNOWN",
+                    "cpu": "0"
+                }
+            ],
+            "cpu": "256",
+            "createdAt": "2025-05-04T09:42:12.369000-04:00",
+            "desiredStatus": "STOPPED",
+            "enableExecuteCommand": false,
+            "executionStoppedAt": "2025-05-04T09:42:37.783000-04:00",
+            "group": "service:photoalbum-django-service",
+            "healthStatus": "UNKNOWN",
+            "lastStatus": "DEPROVISIONING",
+            "launchType": "FARGATE",
+            "memory": "512",
+            "overrides": {
+                "containerOverrides": [
+                    {
+                        "name": "django"
+                    }
+                ],
+                "inferenceAcceleratorOverrides": []
+            },
+            "platformVersion": "1.4.0",
+            "platformFamily": "Linux",
+            "pullStartedAt": "2025-05-04T09:42:23.297000-04:00",
+            "pullStoppedAt": "2025-05-04T09:42:35.404000-04:00",
+            "startedAt": "2025-05-04T09:42:44.286000-04:00",
+            "startedBy": "ecs-svc/4395592025947882592",
+            "stopCode": "EssentialContainerExited",
+            "stoppedReason": "Essential container in task exited",
+            "stoppingAt": "2025-05-04T09:42:47.816000-04:00",
+            "tags": [],
+            "taskArn": "arn:aws:ecs:eu-central-1:084821390246:task/photoalbum-mvp-cluster/6508d1456a204aadb382df4342aea8f3",
+            "taskDefinitionArn": "arn:aws:ecs:eu-central-1:084821390246:task-definition/photoalbum-django:1",
+            "version": 6,
+            "ephemeralStorage": {
+                "sizeInGiB": 20
+            },
+            "fargateEphemeralStorage": {
+                "sizeInGiB": 20
+            }
+        }
+    ],
+    "failures": []
+}
