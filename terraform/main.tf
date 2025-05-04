@@ -6,7 +6,7 @@ terraform {
     }
   }
   cloud {
-    organization = "lab-bme-test-org
+    organization = "lab-bme-test-org"
     workspaces { name = "photoalbum-mvp" }
   }
 }
@@ -206,14 +206,4 @@ resource "aws_ecs_service" "django" {
     container_port   = 8000
   }
   depends_on = [aws_lb_listener.http]
-}
-
-output "alb_dns_name" {
-  value = aws_lb.alb.dns_name
-}
-
-output "s3_bucket_name" { value = aws_s3_bucket.photos.bucket }
-output "db_endpoint" { value = aws_db_instance.postgres.endpoint }
-output "db_username" { value = aws_db_instance.postgres.username }
-output "db_password" { value = random_password.db_password.result }
-output "ecr_repo_url" { value = aws_ecr_repository.django.repository_url } 
+} 
