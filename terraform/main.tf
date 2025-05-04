@@ -29,7 +29,7 @@ resource "aws_db_instance" "postgres" {
   engine               = "postgres"
   engine_version       = "15.4"
   instance_class       = "db.t3.micro"
-  name                 = "photoalbum"
+  db_name              = "photoalbum"
   username             = "photoalbum"
   password             = random_password.db_password.result
   skip_final_snapshot  = true
