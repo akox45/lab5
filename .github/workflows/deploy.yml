@@ -23,6 +23,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Debug AWS credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+          if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then echo "AWS_SECRET_ACCESS_KEY is NOT set"; else echo "AWS_SECRET_ACCESS_KEY is set: [${#AWS_SECRET_ACCESS_KEY}] chars"; fi
+
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
