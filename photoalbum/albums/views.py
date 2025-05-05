@@ -2,8 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
+from django.core.files.base import ContentFile
+import os
 from .models import Photo
 from .forms import PhotoUploadForm
+from .person_detection import PersonDetector
+import cv2
 
 def photo_list(request):
     """Fényképek listázása név vagy dátum szerint"""
@@ -33,8 +37,38 @@ def photo_upload(request):
         if form.is_valid():
             photo = form.save(commit=False)
             photo.user = request.user
+            
+            # Save the original photo first
             photo.save()
-            messages.success(request, 'A kép sikeresen feltöltve!')
+            
+            # Process the image for person detection
+            detector = PersonDetector()
+            processed_image, person_count = detector.detect_persons(photo.image.path)
+            
+            if processed_image is not None:
+                # Save the processed image
+                processed_image_path = os.path.splitext(photo.image.path)[0] + '_processed.jpg'
+                cv2.imwrite(processed_image_path, processed_image)
+                
+                # Save the processed image to the model
+                with open(processed_image_path, 'rb') as f:
+                    photo.processed_image.save(
+                        os.path.basename(processed_image_path),
+                        ContentFile(f.read()),
+                        save=False
+                    )
+                
+                # Update person count
+                photo.detected_persons = person_count
+                photo.save()
+                
+                # Clean up temporary file
+                os.remove(processed_image_path)
+                
+                messages.success(request, f'A kép sikeresen feltöltve! {person_count} személyt észleltünk a képen.')
+            else:
+                messages.error(request, 'Hiba történt a kép feldolgozása során.')
+            
             return redirect('photo_list')
     else:
         form = PhotoUploadForm()

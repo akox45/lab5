@@ -5,10 +5,11 @@ class PhotoUploadForm(forms.ModelForm):
     """Fénykép feltöltési űrlap"""
     class Meta:
         model = Photo
-        fields = ['name', 'image']
+        fields = ['name', 'image', 'description']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add meg a kép nevét (max. 40 karakter)'}),
-            'image': forms.FileInput(attrs={'class': 'form-control'})
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 4}),
         }
     
     def clean_name(self):

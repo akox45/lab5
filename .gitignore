@@ -15,12 +15,15 @@ __pycache__/
 env/
 venv/
 ENV/
+test_env/
 
 # Django
 *.sqlite3
 db.sqlite3
 /staticfiles/
 /media/
+# Ignore uploaded and processed images
+photos/
 
 # VSCode
 .vscode/
@@ -35,3 +38,17 @@ Thumbs.db
 # Git
 *.swp
 *.swo 
+
+# Jupyter and notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+*.bak
+*.tmp
+
+# Ignore test outputs
+*.jpg
+*.png
+*.jpeg
+# But allow static demo/sample images if needed
+!photoalbum/static/ 

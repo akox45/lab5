@@ -25,6 +25,11 @@
                             <small>Feltöltve: {{ photo.upload_date|date:"Y-m-d H:i" }}</small><br>
                             <small>Feltöltő: {{ photo.user.username }}</small>
                         </p>
+                        {% if photo.detected_persons > 0 %}
+                            <p class="card-text text-success">
+                                <small>Észlelt személyek: {{ photo.detected_persons }}</small>
+                            </p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
