@@ -3,46 +3,84 @@
 {% block title %}Fényképek{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Fényképek</h1>
-    <div class="btn-group">
-        <a href="{% url 'photo_list' %}?sort=date" class="btn btn-outline-primary {% if sort_by == 'date' %}active{% endif %}">Dátum szerint</a>
-        <a href="{% url 'photo_list' %}?sort=name" class="btn btn-outline-primary {% if sort_by == 'name' %}active{% endif %}">Név szerint</a>
-    </div>
-</div>
-
-{% if photos %}
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for photo in photos %}
-            <div class="col">
-                <div class="card h-100">
-                    <a href="{% url 'photo_detail' photo.id %}">
-                        <img src="{{ photo.image.url }}" class="card-img-top" alt="{{ photo.name }}">
-                    </a>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ photo.name }}</h5>
-                        <p class="card-text text-muted">
-                            <small>Feltöltve: {{ photo.upload_date|date:"Y-m-d H:i" }}</small><br>
-                            <small>Feltöltő: {{ photo.user.username }}</small>
-                        </p>
-                        {% if photo.detected_persons > 0 %}
-                            <p class="card-text text-success">
-                                <small>Észlelt személyek: {{ photo.detected_persons }}</small>
-                            </p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+{% if notifications %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+    <h4 class="alert-heading">Új értesítések!</h4>
+    <ul class="mb-0">
+        {% for notification in notifications %}
+            <li>{{ notification.message }}</li>
         {% endfor %}
+    </ul>
+    <form action="{% url 'mark_notifications_read' %}" method="post" class="mt-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-info">Értesítések elolvasva</button>
+    </form>
+</div>
+{% endif %}
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Fényképek</h2>
+        <div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'photo_upload' %}" class="btn btn-primary">Új kép feltöltése</a>
+                <a href="{% url 'subscribe_photos' %}" class="btn btn-info">
+                    {% if user.photo_subscriptions.exists %}
+                        Leiratkozás az értesítésekről
+                    {% else %}
+                        Feliratkozás az értesítésekre
+                    {% endif %}
+                </a>
+            {% endif %}
+        </div>
     </div>
-{% else %}
-    <div class="alert alert-info">
-        Még nincsenek feltöltött képek.
-        {% if user.is_authenticated %}
-            <a href="{% url 'photo_upload' %}">Töltsd fel az elsőt!</a>
+    <div class="card-body">
+        <div class="mb-3">
+            <form method="get" class="form-inline">
+                <div class="form-group">
+                    <label for="sort" class="mr-2">Rendezés:</label>
+                    <select name="sort" id="sort" class="form-control" onchange="this.form.submit()">
+                        <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Dátum szerint</option>
+                        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Név szerint</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        
+        {% if photos %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for photo in photos %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <a href="{% url 'photo_detail' photo.id %}">
+                                <img src="{{ photo.image.url }}" class="card-img-top" alt="{{ photo.name }}">
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ photo.name }}</h5>
+                                <p class="card-text text-muted">
+                                    <small>Feltöltve: {{ photo.upload_date|date:"Y-m-d H:i" }}</small><br>
+                                    <small>Feltöltő: {{ photo.user.username }}</small>
+                                </p>
+                                {% if photo.detected_persons > 0 %}
+                                    <p class="card-text text-success">
+                                        <small>Észlelt személyek: {{ photo.detected_persons }}</small>
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <a href="{% url 'login' %}">Jelentkezz be</a> a képfeltöltéshez!
+            <div class="alert alert-info">
+                Még nincsenek feltöltött képek.
+                {% if user.is_authenticated %}
+                    <a href="{% url 'photo_upload' %}">Töltsd fel az elsőt!</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Jelentkezz be</a> a képfeltöltéshez!
+                {% endif %}
+            </div>
         {% endif %}
     </div>
-{% endif %}
+</div>
 {% endblock %}

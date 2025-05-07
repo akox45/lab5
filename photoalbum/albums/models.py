@@ -10,6 +10,33 @@ def get_upload_path(instance, filename):
         filename
     )
 
+class PhotoSubscription(models.Model):
+    """Model for tracking which users want to be notified about new photos"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photo_subscriptions')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Fénykép értesítés"
+        verbose_name_plural = "Fénykép értesítések"
+    
+    def __str__(self):
+        return f"{self.user.username} értesítései"
+
+class Notification(models.Model):
+    """Model for storing notifications"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Értesítés"
+        verbose_name_plural = "Értesítések"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.message[:50]}"
+
 class Photo(models.Model):
     name = models.CharField(max_length=40, verbose_name="Fénykép neve")
     image = models.ImageField(upload_to=get_upload_path, verbose_name="Kép")

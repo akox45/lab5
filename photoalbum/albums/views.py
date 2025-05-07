@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.core.files.base import ContentFile
 import os
-from .models import Photo
+from .models import Photo, PhotoSubscription, Notification
 from .forms import PhotoUploadForm
 from .person_detection import PersonDetector
 import cv2
@@ -18,9 +18,13 @@ def photo_list(request):
     else:  # date
         photos = Photo.objects.all().order_by('-upload_date')
     
+    # Get unread notifications
+    notifications = request.user.notifications.filter(is_read=False)
+    
     context = {
         'photos': photos,
-        'sort_by': sort_by
+        'sort_by': sort_by,
+        'notifications': notifications
     }
     return render(request, 'albums/list.html', context)
 
@@ -65,6 +69,15 @@ def photo_upload(request):
                 # Clean up temporary file
                 os.remove(processed_image_path)
                 
+                # Create notifications for subscribers
+                subscribers = PhotoSubscription.objects.all()
+                for subscriber in subscribers:
+                    if subscriber.user != request.user:  # Don't notify the uploader
+                        Notification.objects.create(
+                            user=subscriber.user,
+                            message=f'Új kép lett feltöltve: {photo.name} (feltöltő: {request.user.username})'
+                        )
+                
                 messages.success(request, f'A kép sikeresen feltöltve! {person_count} személyt észleltünk a képen.')
             else:
                 messages.error(request, 'Hiba történt a kép feldolgozása során.')
@@ -90,3 +103,22 @@ def photo_delete(request, photo_id):
         return redirect('photo_list')
     
     return render(request, 'albums/delete.html', {'photo': photo})
+
+@login_required
+def subscribe_photos(request):
+    """Feliratkozás a fénykép értesítésekre"""
+    subscription, created = PhotoSubscription.objects.get_or_create(user=request.user)
+    
+    if created:
+        messages.success(request, 'Sikeresen feliratkoztál a fénykép értesítésekre!')
+    else:
+        subscription.delete()
+        messages.success(request, 'Sikeresen leiratkoztál a fénykép értesítésekről!')
+    
+    return redirect('photo_list')
+
+@login_required
+def mark_notifications_read(request):
+    """Mark all notifications as read"""
+    request.user.notifications.filter(is_read=False).update(is_read=True)
+    return redirect('photo_list')
