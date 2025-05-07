@@ -16,8 +16,7 @@ RUN apt-get update && apt-get install -y \
 # Install Python dependencies
 COPY photoalbum/requirements.txt ./requirements.txt
 RUN pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && pip install gunicorn psycopg2-binary
+    && pip install -r requirements.txt
 
 # Copy application code
 COPY photoalbum /app
