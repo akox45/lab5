@@ -264,7 +264,29 @@ resource "aws_s3_bucket_public_access_block" "photos" {
   restrict_public_buckets = false
 }
 
+resource "aws_s3_bucket_ownership_controls" "photos" {
+  bucket = aws_s3_bucket.photos.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "photos" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.photos,
+    aws_s3_bucket_public_access_block.photos
+  ]
+
+  bucket = aws_s3_bucket.photos.id
+  acl    = "public-read"
+}
+
 resource "aws_s3_bucket_policy" "photos" {
+  depends_on = [
+    aws_s3_bucket_public_access_block.photos,
+    aws_s3_bucket_acl.photos
+  ]
+
   bucket = aws_s3_bucket.photos.id
   policy = jsonencode({
     Version = "2012-10-17"
