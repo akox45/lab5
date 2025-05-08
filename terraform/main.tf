@@ -239,7 +239,7 @@ resource "aws_lb_listener" "http" {
 resource "aws_ecs_service" "django" {
   name            = "photoalbum-django-service"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = "arn:aws:ecs:eu-central-1:084821390246:task-definition/photoalbum-django:16"
+  task_definition = aws_ecs_task_definition.django.arn
   launch_type     = "FARGATE"
   desired_count   = 1
   network_configuration {
@@ -252,7 +252,6 @@ resource "aws_ecs_service" "django" {
     container_name   = "django"
     container_port   = 8080
   }
-  depends_on = [aws_lb_listener.http]
 }
 
 resource "aws_s3_bucket_public_access_block" "photos" {
