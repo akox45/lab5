@@ -140,9 +140,28 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_s3_access" {
-  role       = aws_iam_role.ecs_task_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+resource "aws_iam_role_policy" "s3_access" {
+  name = "photoalbum-s3-access"
+  role = aws_iam_role.ecs_task_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.photos.arn,
+          "${aws_s3_bucket.photos.arn}/*"
+        ]
+      }
+    ]
+  })
 }
 
 # --- CloudWatch Log Group ---
@@ -179,7 +198,9 @@ resource "aws_ecs_task_definition" "django" {
         { name = "DEBUG", value = "True" },
         { name = "CORS_ALLOW_ALL_ORIGINS", value = "True" },
         { name = "CORS_ALLOW_CREDENTIALS", value = "True" },
-        { name = "ALLOWED_HOSTS", value = "*" }
+        { name = "ALLOWED_HOSTS", value = "*" },
+        { name = "AWS_DEFAULT_ACL", value = "public-read" },
+        { name = "AWS_QUERYSTRING_AUTH", value = "False" }
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -255,6 +276,7 @@ resource "aws_ecs_service" "django" {
   }
 }
 
+# --- S3 Bucket Public Access Block ---
 resource "aws_s3_bucket_public_access_block" "photos" {
   bucket = aws_s3_bucket.photos.id
 
@@ -264,6 +286,7 @@ resource "aws_s3_bucket_public_access_block" "photos" {
   restrict_public_buckets = false
 }
 
+# --- S3 Bucket Ownership Controls ---
 resource "aws_s3_bucket_ownership_controls" "photos" {
   bucket = aws_s3_bucket.photos.id
   rule {
@@ -271,6 +294,7 @@ resource "aws_s3_bucket_ownership_controls" "photos" {
   }
 }
 
+# --- S3 Bucket ACL ---
 resource "aws_s3_bucket_acl" "photos" {
   depends_on = [
     aws_s3_bucket_ownership_controls.photos,
@@ -281,6 +305,7 @@ resource "aws_s3_bucket_acl" "photos" {
   acl    = "public-read"
 }
 
+# --- S3 Bucket Policy ---
 resource "aws_s3_bucket_policy" "photos" {
   depends_on = [
     aws_s3_bucket_public_access_block.photos,
@@ -295,13 +320,18 @@ resource "aws_s3_bucket_policy" "photos" {
         Sid       = "PublicReadGetObject"
         Effect    = "Allow"
         Principal = "*"
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.photos.arn}/*"
+        Action    = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${aws_s3_bucket.photos.arn}/*"
       }
     ]
   })
 }
 
+# --- S3 Bucket CORS Configuration ---
 resource "aws_s3_bucket_cors_configuration" "photos" {
   bucket = aws_s3_bucket.photos.id
 
