@@ -2,26 +2,32 @@
     "family": "photoalbum-django",
     "networkMode": "awsvpc",
     "requiresCompatibilities": ["FARGATE"],
-    "cpu": "256",
-    "memory": "512",
+    "cpu": "512",
+    "memory": "1024",
     "executionRoleArn": "arn:aws:iam::084821390246:role/photoalbum-ecs-task-execution",
     "taskRoleArn": "arn:aws:iam::084821390246:role/photoalbum-ecs-task-execution",
     "containerDefinitions": [
         {
             "name": "django",
-            "image": "084821390246.dkr.ecr.eu-central-1.amazonaws.com/photoalbum-mvp-django:v1",
+            "image": "084821390246.dkr.ecr.eu-central-1.amazonaws.com/photoalbum-mvp-django:latest",
+            "cpu": 256,
+            "memory": 512,
             "essential": true,
             "portMappings": [
                 {
-                    "containerPort": 8000,
-                    "hostPort": 8000,
+                    "containerPort": 8080,
+                    "hostPort": 8080,
                     "protocol": "tcp"
                 }
             ],
             "environment": [
                 {
                     "name": "DATABASE_URL",
-                    "value": "postgres://photoalbum:pcm89dZyw22CRalt@terraform-20250504123144577700000001.cncc64sqaa80.eu-central-1.rds.amazonaws.com:5432/photoalbum"
+                    "value": "postgres://photoalbum:jIzU1wqODEdlJzG4@terraform-20250507233545885400000003.cncc64sqaa80.eu-central-1.rds.amazonaws.com:5432/photoalbum"
+                },
+                {
+                    "name": "AWS_ACCESS_KEY_ID",
+                    "value": "AKIAIOSFODNN7EXAMPLE"
                 },
                 {
                     "name": "USE_S3",
@@ -32,32 +38,36 @@
                     "value": "{\"CacheControl\": \"max-age=86400\"}"
                 },
                 {
+                    "name": "CORS_ALLOW_ALL_ORIGINS",
+                    "value": "True"
+                },
+                {
+                    "name": "AWS_SECRET_ACCESS_KEY",
+                    "value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+                },
+                {
                     "name": "AWS_S3_REGION_NAME",
                     "value": "eu-central-1"
                 },
                 {
+                    "name": "ALLOWED_HOSTS",
+                    "value": "*"
+                },
+                {
                     "name": "SECRET_KEY",
-                    "value": "django-insecure-1234567890abcdefghijklmnopqrstuvwxyz"
-                },
-                {
-                    "name": "AWS_STORAGE_BUCKET_NAME",
-                    "value": "photoalbum-mvp-photos-72ff1842"
-                },
-                {
-                    "name": "DEBUG",
-                    "value": "True"
-                },
-                {
-                    "name": "CORS_ALLOW_ALL_ORIGINS",
-                    "value": "True"
+                    "value": "admin"
                 },
                 {
                     "name": "CORS_ALLOW_CREDENTIALS",
                     "value": "True"
                 },
                 {
-                    "name": "ALLOWED_HOSTS",
-                    "value": "*"
+                    "name": "DEBUG",
+                    "value": "True"
+                },
+                {
+                    "name": "AWS_STORAGE_BUCKET_NAME",
+                    "value": "photoalbum-mvp-photos-9113d34d"
                 }
             ],
             "logConfiguration": {
@@ -69,11 +79,14 @@
                 }
             },
             "healthCheck": {
-                "command": ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"],
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:8080/health/ || exit 1"
+                ],
                 "interval": 30,
-                "timeout": 5,
+                "timeout": 30,
                 "retries": 3,
-                "startPeriod": 60
+                "startPeriod": 5
             }
         }
     ]

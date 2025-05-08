@@ -18,8 +18,10 @@ def photo_list(request):
     else:  # date
         photos = Photo.objects.all().order_by('-upload_date')
     
-    # Get unread notifications
-    notifications = request.user.notifications.filter(is_read=False)
+    # Get unread notifications only for authenticated users
+    notifications = []
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.filter(is_read=False)
     
     context = {
         'photos': photos,
