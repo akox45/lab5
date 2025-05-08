@@ -163,7 +163,7 @@ resource "aws_ecs_task_definition" "django" {
   container_definitions    = jsonencode([
     {
       name      = "django"
-      image     = "${aws_ecr_repository.django.repository_url}:v1"
+      image     = "${aws_ecr_repository.django.repository_url}:latest"
       essential = true
       portMappings = [{ containerPort = 8080, hostPort = 8080 }]
       environment = [
@@ -239,7 +239,7 @@ resource "aws_lb_listener" "http" {
 resource "aws_ecs_service" "django" {
   name            = "photoalbum-django-service"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.django.arn
+  task_definition = "arn:aws:ecs:eu-central-1:084821390246:task-definition/photoalbum-django:16"
   launch_type     = "FARGATE"
   desired_count   = 1
   network_configuration {
