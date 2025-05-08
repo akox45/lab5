@@ -50,8 +50,6 @@ resource "aws_ecs_cluster" "main" {
   name = "photoalbum-mvp-cluster"
 }
 
-# A többi (ECS task, service, IAM role, stb.) a következő lépésben jön, hogy átlátható maradjon a fájl.
-
 # --- Security Group for ALB and ECS ---
 resource "aws_security_group" "alb" {
   name        = "photoalbum-alb-sg"
@@ -140,28 +138,9 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_role_policy" "s3_access" {
-  name = "photoalbum-s3-access"
-  role = aws_iam_role.ecs_task_execution.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          aws_s3_bucket.photos.arn,
-          "${aws_s3_bucket.photos.arn}/*"
-        ]
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "ecs_s3_access" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 # --- CloudWatch Log Group ---
@@ -226,7 +205,7 @@ resource "aws_lb" "alb" {
 }
 
 resource "aws_lb_target_group" "django" {
-  name     = "photoalbum-django-tg-${random_id.suffix.hex}-${formatdate("YYYYMMDDHHmmss", timestamp())}"
+  name     = "photoalbum-django-tg-${random_id.suffix.hex}"
   port     = 8000
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
@@ -240,10 +219,6 @@ resource "aws_lb_target_group" "django" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_lb_listener" "http" {
@@ -253,10 +228,6 @@ resource "aws_lb_listener" "http" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.django.arn
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -278,13 +249,8 @@ resource "aws_ecs_service" "django" {
     container_port   = 8000
   }
   depends_on = [aws_lb_listener.http]
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
-# --- S3 Bucket Public Access Block ---
 resource "aws_s3_bucket_public_access_block" "photos" {
   bucket = aws_s3_bucket.photos.id
 
@@ -292,62 +258,4 @@ resource "aws_s3_bucket_public_access_block" "photos" {
   block_public_policy = false
   ignore_public_acls  = false
   restrict_public_buckets = false
-}
-
-# --- S3 Bucket Ownership Controls ---
-resource "aws_s3_bucket_ownership_controls" "photos" {
-  bucket = aws_s3_bucket.photos.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-# --- S3 Bucket ACL ---
-resource "aws_s3_bucket_acl" "photos" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.photos,
-    aws_s3_bucket_public_access_block.photos
-  ]
-
-  bucket = aws_s3_bucket.photos.id
-  acl    = "public-read"
-}
-
-# --- S3 Bucket Policy ---
-resource "aws_s3_bucket_policy" "photos" {
-  depends_on = [
-    aws_s3_bucket_public_access_block.photos,
-    aws_s3_bucket_acl.photos
-  ]
-
-  bucket = aws_s3_bucket.photos.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "PublicReadGetObject"
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject"
-        ]
-        Resource = "${aws_s3_bucket.photos.arn}/*"
-      }
-    ]
-  })
-}
-
-# --- S3 Bucket CORS Configuration ---
-resource "aws_s3_bucket_cors_configuration" "photos" {
-  bucket = aws_s3_bucket.photos.id
-
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "PUT", "POST", "DELETE"]
-    allowed_origins = ["*"]
-    expose_headers  = ["ETag"]
-    max_age_seconds = 3000
-  }
 } 
