@@ -226,7 +226,7 @@ resource "aws_lb" "alb" {
 }
 
 resource "aws_lb_target_group" "django" {
-  name     = "photoalbum-django-tg-${random_id.suffix.hex}"
+  name     = "photoalbum-django-tg-${random_id.suffix.hex}-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   port     = 8000
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
