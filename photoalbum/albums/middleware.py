@@ -7,19 +7,13 @@ class NotificationMiddleware:
 
     def __call__(self, request):
         # Process notifications before the view
-        if request.user.is_authenticated and 'notifications' in request.session:
-            user_notifications = [
-                n for n in request.session['notifications']
-                if n['user_id'] == request.user.id
-            ]
-            for notification in user_notifications:
-                messages.success(request, notification['message'])
-            # Remove processed notifications
-            request.session['notifications'] = [
-                n for n in request.session['notifications']
-                if n['user_id'] != request.user.id
-            ]
-            request.session.modified = True
+        if request.user.is_authenticated:
+            # Get notifications from database
+            notifications = request.user.notifications.filter(is_read=False)
+            for notification in notifications:
+                messages.success(request, notification.message)
+                notification.is_read = True
+                notification.save()
 
         response = self.get_response(request)
         return response 

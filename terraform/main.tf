@@ -173,6 +173,7 @@ resource "aws_ecs_task_definition" "django" {
         { name = "AWS_SECRET_ACCESS_KEY", value = var.aws_secret_access_key },
         { name = "AWS_S3_OBJECT_PARAMETERS", value = "{\"CacheControl\": \"max-age=86400\"}" },
         { name = "AWS_S3_REGION_NAME", value = var.aws_region },
+        { name = "AWS_S3_CUSTOM_DOMAIN", value = "${aws_s3_bucket.photos.bucket}.s3.amazonaws.com" },
         { name = "SECRET_KEY", value = var.django_secret_key },
         { name = "AWS_STORAGE_BUCKET_NAME", value = aws_s3_bucket.photos.bucket },
         { name = "DEBUG", value = "True" },
