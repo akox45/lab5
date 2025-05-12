@@ -202,6 +202,10 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = data.aws_subnets.default.ids
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_target_group" "django" {
@@ -219,6 +223,10 @@ resource "aws_lb_target_group" "django" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "http" {
@@ -228,6 +236,10 @@ resource "aws_lb_listener" "http" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.django.arn
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
