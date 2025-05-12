@@ -76,8 +76,8 @@ resource "aws_security_group" "ecs" {
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    from_port       = 8000
-    to_port         = 8000
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
@@ -186,10 +186,10 @@ resource "aws_ecs_task_definition" "django" {
       }
       healthCheck = {
         command = ["CMD-SHELL", "curl -f http://localhost:8080/health/ || exit 1"]
-        interval = 30
-        timeout = 5
+        interval = 60
+        timeout = 10
         retries = 3
-        startPeriod = 60
+        startPeriod = 120
       }
     }
   ])
@@ -218,10 +218,10 @@ resource "aws_lb_target_group" "django" {
     path                = "/health/"
     protocol            = "HTTP"
     matcher             = "200-399"
-    interval            = 30
-    timeout             = 5
+    interval            = 60
+    timeout             = 10
     healthy_threshold   = 2
-    unhealthy_threshold = 2
+    unhealthy_threshold = 3
   }
 
   lifecycle {
