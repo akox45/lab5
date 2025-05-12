@@ -44,7 +44,7 @@ RUN python manage.py collectstatic --noinput
 
 # Health check
 HEALTHCHECK --interval=60s --timeout=10s --start-period=120s --retries=3 \
-    CMD curl -f http://localhost:8080/health/ || exit 1
+    CMD curl -f http://localhost:8080/ || exit 1
 
 # Start the application
 CMD python manage.py migrate && \

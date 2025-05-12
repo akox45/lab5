@@ -43,51 +43,24 @@ def photo_upload(request):
         if form.is_valid():
             photo = form.save(commit=False)
             photo.user = request.user
-            
-            # Save the original photo first
-            photo.save()
-            
-            # Process the image for person detection
+
+            # Process the image
             detector = PersonDetector()
-            processed_image, person_count = detector.detect_persons(photo.image.path)
-            
-            if processed_image is not None:
-                # Save the processed image
-                processed_image_path = os.path.splitext(photo.image.path)[0] + '_processed.jpg'
-                cv2.imwrite(processed_image_path, processed_image)
-                
-                # Save the processed image to the model
-                with open(processed_image_path, 'rb') as f:
-                    photo.processed_image.save(
-                        os.path.basename(processed_image_path),
-                        ContentFile(f.read()),
-                        save=False
-                    )
-                
-                # Update person count
-                photo.detected_persons = person_count
-                photo.save()
-                
-                # Clean up temporary file
-                os.remove(processed_image_path)
-                
-                # Create notifications for subscribers
-                subscribers = PhotoSubscription.objects.all()
-                for subscriber in subscribers:
-                    if subscriber.user != request.user:  # Don't notify the uploader
-                        Notification.objects.create(
-                            user=subscriber.user,
-                            message=f'Új kép lett feltöltve: {photo.name} (feltöltő: {request.user.username})'
-                        )
-                
-                messages.success(request, f'A kép sikeresen feltöltve! {person_count} személyt észleltünk a képen.')
-            else:
-                messages.error(request, 'Hiba történt a kép feldolgozása során.')
-            
+            processed_image, person_count = detector.detect_persons(request.FILES['image'])
+
+            # Save the processed image
+            photo.image.save(
+                os.path.basename(request.FILES['image'].name),
+                processed_image,
+                save=False
+            )
+            photo.detected_persons = person_count
+            photo.save()
+
+            messages.success(request, 'Photo uploaded successfully!')
             return redirect('photo_list')
     else:
         form = PhotoUploadForm()
-    
     return render(request, 'albums/upload.html', {'form': form})
 
 @login_required
