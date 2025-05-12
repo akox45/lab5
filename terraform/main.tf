@@ -185,7 +185,7 @@ resource "aws_ecs_task_definition" "django" {
         }
       }
       healthCheck = {
-        command = ["CMD-SHELL", "curl -f http://localhost:8080/ || exit 1"]
+        command = ["CMD-SHELL", "curl -f http://localhost:8080/health/ || exit 1"]
         interval = 30
         timeout = 5
         retries = 3
@@ -215,7 +215,7 @@ resource "aws_lb_target_group" "django" {
   vpc_id   = data.aws_vpc.default.id
   target_type = "ip"
   health_check {
-    path                = "/"
+    path                = "/health/"
     protocol            = "HTTP"
     matcher             = "200-399"
     interval            = 30

@@ -7,6 +7,6 @@ def health_check(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', health_check),  # Root path for health check
-    path('photos/', include('photos.urls')),
+    path('health/', health_check),  # Health check endpoint
+    path('', include('photos.urls')),  # Main application
 ] 
