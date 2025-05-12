@@ -57,7 +57,16 @@ def photo_upload(request):
             photo.detected_persons = person_count
             photo.save()
 
-            messages.success(request, 'Photo uploaded successfully!')
+            # Create notifications for subscribers
+            subscribers = PhotoSubscription.objects.all()
+            for subscriber in subscribers:
+                if subscriber.user != request.user:  # Don't notify the uploader
+                    Notification.objects.create(
+                        user=subscriber.user,
+                        message=f'Új kép lett feltöltve: {photo.name} (feltöltő: {request.user.username})'
+                    )
+
+            messages.success(request, f'A kép sikeresen feltöltve! {person_count} személyt észleltünk a képen.')
             return redirect('photo_list')
     else:
         form = PhotoUploadForm()
