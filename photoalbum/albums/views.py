@@ -44,13 +44,18 @@ def photo_upload(request):
             photo = form.save(commit=False)
             photo.user = request.user
 
-            # Process the image
             detector = PersonDetector()
             processed_image, person_count = detector.detect_persons(request.FILES['image'])
 
-            # Save the processed image
+            # Eredeti kép mentése
             photo.image.save(
                 os.path.basename(request.FILES['image'].name),
+                request.FILES['image'],
+                save=False
+            )
+            # Feldolgozott kép mentése
+            photo.processed_image.save(
+                f"processed_{os.path.basename(request.FILES['image'].name)}",
                 processed_image,
                 save=False
             )
