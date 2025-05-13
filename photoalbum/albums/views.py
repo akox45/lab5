@@ -44,16 +44,18 @@ def photo_upload(request):
             photo = form.save(commit=False)
             photo.user = request.user
 
-            detector = PersonDetector()
-            processed_image, person_count = detector.detect_persons(request.FILES['image'])
-
-            # Eredeti kép mentése
+            # Eredeti kép mentése változatlanul
             photo.image.save(
                 os.path.basename(request.FILES['image'].name),
                 request.FILES['image'],
                 save=False
             )
-            # Feldolgozott kép mentése
+
+            # Feldolgozott kép generálása és mentése
+            detector = PersonDetector()
+            # Újra meg kell nyitni a képet, mert előző read() után a pointer a végén van
+            request.FILES['image'].seek(0)
+            processed_image, person_count = detector.detect_persons(request.FILES['image'])
             photo.processed_image.save(
                 f"processed_{os.path.basename(request.FILES['image'].name)}",
                 processed_image,
